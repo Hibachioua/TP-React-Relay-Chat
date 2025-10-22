@@ -31,18 +31,21 @@ export function Login() {
     const form = event.currentTarget;
     const data = new FormData(form);
 
-    const username = (data.get("login") as string)?.trim();
+    // ⬇️ Un seul champ pour username OU email
+    const identifier = (data.get("identifier") as string)?.trim();
     const password = (data.get("password") as string) ?? "";
 
     // Validation minimale côté client
-    if (!username || !password) {
-      setError(new CustomError("Veuillez saisir un identifiant et un mot de passe."));
+    if (!identifier || !password) {
+      setError(new CustomError("Veuillez saisir un identifiant (ou e-mail) et un mot de passe."));
       setLoading(false);
       return;
     }
 
+    // ⬇️ Nouvelle signature: (identifier, password, onResult, onError)
     loginUser(
-      { user_id: -1, username, password },
+      identifier,
+      password,
       (result: Session) => {
         setSession(result);
         form.reset();
@@ -84,13 +87,13 @@ export function Login() {
         </Box>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Entrez vos identifiants pour accéder à votre espace.
+          Entrez votre identifiant <em>ou</em> e-mail et votre mot de passe.
         </Typography>
 
         <Box component="form" noValidate onSubmit={handleSubmit}>
           <TextField
-            name="login"
-            label="Identifiant"
+            name="identifier"                 // ⬅️ nom de champ unifié
+            label="Identifiant ou e-mail"     // ⬅️ libellé explicite
             autoComplete="username"
             fullWidth
             margin="normal"
