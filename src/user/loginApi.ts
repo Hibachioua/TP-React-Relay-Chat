@@ -2,6 +2,35 @@
 import { Session, SessionCallback, ErrorCallback } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
+
+const SESSION_KEY = "session";
+
+export function saveSession(session: Session) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem("token", session.token);
+    sessionStorage.setItem("username", session.username);
+  } finally {
+    window.dispatchEvent(new CustomEvent("session-changed"));
+  }
+}
+export function getSession(): Session | null {
+  const raw = localStorage.getItem(SESSION_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as Session;
+  } catch {
+    return null;
+  }
+} 
+export function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("username");
+  sessionStorage.removeItem("externalId");
+  window.dispatchEvent(new CustomEvent("session-changed"));
+}
+
 export function loginUser(
   identifier: string,   // 👈 au lieu de username
   password: string,
@@ -16,6 +45,8 @@ export function loginUser(
     .then(async (response) => {
       if (response.ok) {
         const session = (await response.json()) as Session;
+        console.log("Received token:", session.token);
+
         sessionStorage.setItem("token", session.token);
         if (session.externalId) sessionStorage.setItem("externalId", session.externalId);
         if (session.username) sessionStorage.setItem("username", session.username);

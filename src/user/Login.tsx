@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { loginUser } from "./loginApi";
+import { useNavigate } from "react-router-dom";
+import { loginUser, saveSession } from "./loginApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
@@ -18,44 +19,64 @@ import {
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 
 export function Login() {
-  const [error, setError] = useState({} as CustomError);
-  const [session, setSession] = useState({} as Session);
-  const [loading, setLoading] = useState(false);
-  const [showPw, setShowPw] = useState(false);
+  // États avec types explicites et valeurs par défaut
+  const [error, setError] = useState<CustomError | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(new CustomError(""));
-    setLoading(true);
+    
+    // Réinitialisation des états
+    setError(null);
+    setIsLoading(true);
 
     const form = event.currentTarget;
     const data = new FormData(form);
 
-    // ⬇️ Un seul champ pour username OU email
+    // Extraction et validation des données
     const identifier = (data.get("identifier") as string)?.trim();
-    const password = (data.get("password") as string) ?? "";
+    const password = (data.get("password") as string)?.trim() ?? "";
 
-    // Validation minimale côté client
+    // Validation des champs
     if (!identifier || !password) {
-      setError(new CustomError("Veuillez saisir un identifiant (ou e-mail) et un mot de passe."));
-      setLoading(false);
+      setError(new CustomError("Veuillez saisir un identifiant et un mot de passe."));
+      setIsLoading(false);
       return;
     }
 
-    // ⬇️ Nouvelle signature: (identifier, password, onResult, onError)
+    // Gestion de la connexion
     loginUser(
       identifier,
       password,
+      // Succès
       (result: Session) => {
-        setSession(result);
-        form.reset();
-        setError(new CustomError(""));
-        setLoading(false);
+        try {
+          // Sauvegarde de la session
+          saveSession(result);
+          
+          // Stockage sécurisé des informations
+          sessionStorage.setItem("token", result.token);
+          sessionStorage.setItem("username", result.username);
+          
+          // Réinitialisation du formulaire
+          form.reset();
+          
+          // Arrêt du chargement et navigation
+          setIsLoading(false);
+          navigate("/chat");
+        } catch (e) {
+          // Gestion des erreurs inattendues
+          setError(new CustomError("Erreur technique lors de la connexion."));
+          setIsLoading(false);
+        }
       },
+      // Erreur
       (loginError: CustomError) => {
         setError(loginError ?? new CustomError("Échec de connexion."));
-        setSession({} as Session);
-        setLoading(false);
+        setIsLoading(false);
       }
     );
   };
@@ -79,6 +100,7 @@ export function Login() {
           borderRadius: 3,
         }}
       >
+        {/* En-tête du formulaire */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <LockOutlined color="primary" />
           <Typography variant="h5" fontWeight={700}>
@@ -90,39 +112,43 @@ export function Login() {
           Entrez votre identifiant <em>ou</em> e-mail et votre mot de passe.
         </Typography>
 
+        {/* Formulaire */}
         <Box component="form" noValidate onSubmit={handleSubmit}>
           <TextField
-            name="identifier"                 // ⬅️ nom de champ unifié
-            label="Identifiant ou e-mail"     // ⬅️ libellé explicite
+            name="identifier"
+            label="Identifiant ou e-mail"
             autoComplete="username"
             fullWidth
             margin="normal"
             size="medium"
+            required
           />
 
           <TextField
             name="password"
             label="Mot de passe"
-            type={showPw ? "text" : "password"}
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             fullWidth
             margin="normal"
             size="medium"
+            required
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label={showPw ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                    onClick={() => setShowPw((v) => !v)}
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    onClick={() => setShowPassword(prev => !prev)}
                     edge="end"
                   >
-                    {showPw ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
 
+          {/* Options supplémentaires */}
           <Box
             sx={{
               display: "flex",
@@ -131,36 +157,51 @@ export function Login() {
               mt: 1,
             }}
           >
-            <FormControlLabel control={<Checkbox name="remember" />} label="Se souvenir de moi" />
-            <Button size="small" variant="text">Mot de passe oublié ?</Button>
+            <FormControlLabel 
+              control={<Checkbox name="remember" />} 
+              label="Se souvenir de moi" 
+            />
+            <Button size="small" variant="text">
+              Mot de passe oublié ?
+            </Button>
           </Box>
 
-          {error?.message && (
+          {/* Gestion des erreurs */}
+          {error && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {error.message}
             </Alert>
           )}
 
-          {session?.token && (
-            <Alert severity="success" sx={{ mt: 2 }}>
-              Connecté·e en tant que <strong>{session.username}</strong>
-            </Alert>
-          )}
-
+          {/* Bouton de connexion */}
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 3, py: 1.1, textTransform: "none", fontWeight: 600 }}
-            disabled={loading}
+            sx={{ 
+              mt: 3, 
+              py: 1.1, 
+              textTransform: "none", 
+              fontWeight: 600 
+            }}
+            disabled={isLoading}
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
         </Box>
 
-        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 3, textAlign: "center" }}>
-          En continuant, vous acceptez nos Conditions d’utilisation et notre Politique de confidentialité.
+        {/* Conditions d'utilisation */}
+        <Typography 
+          variant="caption" 
+          color="text.secondary" 
+          sx={{ 
+            display: "block", 
+            mt: 3, 
+            textAlign: "center" 
+          }}
+        >
+          En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
         </Typography>
       </Paper>
     </Box>

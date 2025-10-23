@@ -1,23 +1,24 @@
-import React from "react";
+// src/components/NavBar.tsx
+import React, { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
-  AppBar,
-  Toolbar,
-  Button,
-  Box,
-  Typography,
-  useTheme,
-  IconButton,
+  AppBar, Toolbar, Button, Box, Typography, useTheme, IconButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { getSession } from "../user/loginApi";
+import Logout from "../user/Logout"; // ⬅️ import default
 
-/**
- * NavBar principale de l’application
- * - Utilise Material UI
- * - Fournit la navigation entre Login et Register
- */
 export function NavBar() {
   const theme = useTheme();
+  const [session, setSession] = useState(getSession());
+
+  useEffect(() => {
+    const onChange = () => setSession(getSession());
+    window.addEventListener("session-changed", onChange);
+    return () => window.removeEventListener("session-changed", onChange);
+  }, []);
+
+  const isLogged = !!session?.token;
 
   return (
     <AppBar
@@ -31,7 +32,6 @@ export function NavBar() {
       }}
     >
       <Toolbar sx={{ display: "flex", alignItems: "center" }}>
-        {/* Logo ou titre */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexGrow: 1 }}>
           <IconButton color="inherit" edge="start" sx={{ mr: 1 }}>
             <MenuIcon />
@@ -41,13 +41,23 @@ export function NavBar() {
           </Typography>
         </Box>
 
-        {/* Liens de navigation */}
-        <Button color="inherit" component={RouterLink} to="/login">
-          Connexion
-        </Button>
-        <Button color="inherit" component={RouterLink} to="/register">
-          Inscription
-        </Button>
+        {isLogged ? (
+          <>
+            <Typography sx={{ mr: 2 }}>
+              Bonjour <strong>{session?.username}</strong>
+            </Typography>
+            <Logout />
+          </>
+        ) : (
+          <>
+            <Button color="inherit" component={RouterLink} to="/login">
+              Connexion
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/register">
+              Inscription
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );

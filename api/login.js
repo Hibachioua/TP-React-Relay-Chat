@@ -53,6 +53,7 @@ export default async function handler(request) {
     await client.sql`UPDATE users SET last_login = NOW() WHERE user_id = ${user.user_id}`;
 
     const token = (crypto.randomUUID?.() || String(Math.random()).slice(2)).replaceAll('-', '');
+    console.log("Generated token:", token); // Log du token généré
     await redis.set(token, { id: user.user_id, username: user.username }, { ex: 3600 });
 
     return json({
