@@ -1,9 +1,11 @@
-import React, { useMemo } from "react";
+// src/chat/MessageList.tsx
+import { useEffect, useMemo, useRef } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useChatStore } from "../store/chatStore";
 
 export function MessageList() {
-  const { messages, selected, users } = useChatStore();
+  const { messages, selected, users, meId } = useChatStore();
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   const current = useMemo(() => {
     if (!selected) return [];
@@ -19,11 +21,17 @@ export function MessageList() {
     return u ? u.username : "Conversation";
   }, [selected, users]);
 
+  // auto-scroll en bas à chaque update
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [current.length]);
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
         <Typography variant="subtitle1" fontWeight={700}>{header}</Typography>
       </Box>
+
       <Box sx={{ flex: 1, p: 2, overflow: "auto", display: "flex", flexDirection: "column", gap: 1 }}>
         {!selected && (
           <Typography color="text.secondary">Choisis un destinataire à gauche.</Typography>
@@ -31,12 +39,45 @@ export function MessageList() {
         {selected && current.length === 0 && (
           <Typography color="text.secondary">Aucun message pour l’instant.</Typography>
         )}
-        {current.map((m) => (
-          <Paper key={m.id} variant="outlined" sx={{ p: 1.2 }}>
-            <Typography variant="caption" color="text.secondary">{new Date(m.at).toLocaleString()}</Typography>
-            <Typography sx={{ whiteSpace: "pre-wrap" }}>{m.text}</Typography>
-          </Paper>
-        ))}
+
+        {current.map((m) => {
+          const isMine = m.from === "me" || (meId && String(m.from) === String(meId));
+
+          return (
+            <Box
+              key={m.id}
+              sx={{
+                display: "flex",
+                justifyContent: isMine ? "flex-end" : "flex-start",
+                width: "100%",
+              }}
+            >
+              <Paper
+                elevation={0}
+                sx={{
+                  px: 1.5,
+                  py: 1,
+                  maxWidth: "75%",
+                  bgcolor: isMine ? "primary.main" : "grey.100",
+                  color: isMine ? "primary.contrastText" : "text.primary",
+                  borderRadius: 2,
+                  // style bulle
+                  borderTopLeftRadius: isMine ? 2 : 0,
+                  borderTopRightRadius: isMine ? 0 : 2,
+                }}
+              >
+                <Typography variant="caption" sx={{ opacity: 0.8, display: "block", mb: 0.5, textAlign: isMine ? "right" : "left" }}>
+                  {new Date(m.at).toLocaleString()}
+                </Typography>
+                <Typography sx={{ whiteSpace: "pre-wrap" }}>
+                  {m.text}
+                </Typography>
+              </Paper>
+            </Box>
+          );
+        })}
+
+        <div ref={endRef} />
       </Box>
     </Box>
   );

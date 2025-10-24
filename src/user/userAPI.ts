@@ -55,3 +55,11 @@ export async function fetchUsers(token: string): Promise<PublicUser[]> {
     throw error;
   }
 }
+export async function fetchMessages(token: string, kind: "user" | "room", id: string | number) {
+  const res = await fetch(`/api/messages?kind=${kind}&id=${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status === 401) throw new Error("Session expired");
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json(); // [{id, from_user_id, to_user_id, room_id, text, created_at}, ...]
+}

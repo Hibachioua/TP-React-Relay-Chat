@@ -20,14 +20,17 @@ type ChatMessage = {
   at: string;
 };
 
-type ChatState = {
+// src/store/chatStore.ts
+export type ChatState = {
   sessionToken?: string;
+  meId?: string;                     // ⬅️ NEW
   users: PublicUser[];
   rooms: { id: string; name: string }[];
   selected?: Target;
   messages: ChatMessage[];
 
   setSessionToken: (t?: string) => void;
+  setMeId: (id?: string) => void;    // ⬅️ NEW
   setUsers: (u: PublicUser[]) => void;
   setRooms: (r: { id: string; name: string }[]) => void;
   select: (t?: Target) => void;
@@ -37,23 +40,22 @@ type ChatState = {
 
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionToken: undefined,
+  meId: undefined,                   // ⬅️ NEW
   users: [],
   rooms: [],
   selected: undefined,
   messages: [],
 
   setSessionToken: (t?: string) => set({ sessionToken: t }),
-  setUsers: (u: PublicUser[]) => set({ users: u }),
-  setRooms: (r: { id: string; name: string }[]) => set({ rooms: r }),
-  select: (t?: Target) => set({ selected: t }),
-
-  setMessagesFor: (t: Target, msgs: ChatMessage[]) => {
+  setMeId: (id?: string) => set({ meId: id }),   // ⬅️ NEW
+  setUsers: (u) => set({ users: u }),
+  setRooms: (r) => set({ rooms: r }),
+  select: (t) => set({ selected: t }),
+  setMessagesFor: (t, msgs) => {
     const keep = get().messages.filter(
-      (m: ChatMessage) => !(m.to.kind === t.kind && m.to.id === t.id)
+      (m) => !(m.to.kind === t.kind && m.to.id === t.id)
     );
     set({ messages: [...keep, ...msgs] });
   },
-
-  addMessage: (m: ChatMessage) =>
-    set({ messages: [...get().messages, m] }),
+  addMessage: (m) => set({ messages: [...get().messages, m] }),
 }));

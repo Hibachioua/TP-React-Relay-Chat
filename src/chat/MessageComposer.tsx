@@ -2,59 +2,63 @@ import React, { useState } from "react";
 import { Box, IconButton, Paper, TextField, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { useChatStore } from "../store/chatStore";
+// ⬅️ MessageComposer.tsx est dans src/chat, donc:
+import { sendMessageAPI, fetchMessagesAPI } from "./messageApi";
 
-type Props = { token: string };
-
-export function MessageComposer({ token }: Props) {
-  const { selected, addMessage } = useChatStore();
+export function MessageComposer() {
   const [text, setText] = useState("");
+  const { selected, addMessage, setMessagesFor, sessionToken } = useChatStore();
 
-  const disabled = !selected || text.trim().length === 0;
+  const onSend = async () => {
+    if (!selected || !text.trim() || !sessionToken) return;
 
-  const send = async () => {
-    if (!selected) return;
+    const sentText = text.trim();
 
-    // Appel backend d’envoi (ex: /api/message)
-    // Ton backend current message.js lit le body et TODO: save
-    const res = await fetch("/api/message", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        Authorization: `Bearer ${token}`, // 🔐 IMPORTANT
-      },
-      body: JSON.stringify({
-        to: selected,
-        text,
-      }),
-    });
-
-    if (res.status === 401) {
-      alert("Session expirée (401). Reconnecte-toi.");
-      return;
-    }
-    if (!res.ok) {
-      const t = await res.text();
-      alert(`Erreur envoi: ${res.status} ${t}`);
-      return;
-    }
-
-    // Optimistic UI
+    // optimistic
+    const tempId = `temp:${crypto.randomUUID()}`;
     addMessage({
-      id: crypto.randomUUID(),
-      from: "me", // ou l’id utilisateur courant si tu l’as
+      id: tempId,
+      from: "me",
       to: selected,
-      text: text.trim(),
+      text: sentText,
       at: new Date().toISOString(),
     });
     setText("");
-  };
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!disabled) send();
+    try {
+      await sendMessageAPI(sessionToken, selected, sentText);
+      const rows = await fetchMessagesAPI(sessionToken, selected);
+      const mapped = rows.map((r) => ({
+        id: String(r.id),
+        from: String(r.from_user_id),
+        to: selected,
+        text: r.text,
+        at: new Date(r.created_at).toISOString(),
+      }));
+      setMessagesFor(selected, mapped);
+    } catch (e) {
+      console.error("send failed", e);
+      const rows = await fetchMessagesAPI(sessionToken, selected);
+      const mapped = rows.map((r) => ({
+        id: String(r.id),
+        from: String(r.from_user_id),
+        to: selected,
+        text: r.text,
+        at: new Date(r.created_at).toISOString(),
+      }));
+      setMessagesFor(selected, mapped);
     }
   };
+
+  // Enter envoie, Shift+Enter fait un retour à la ligne
+ const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    onSend();
+  }
+};
+
+  const disabled = !selected || !text.trim() || !sessionToken;
 
   return (
     <Paper square sx={{ p: 1, borderTop: 1, borderColor: "divider" }}>
@@ -62,16 +66,18 @@ export function MessageComposer({ token }: Props) {
         <TextField
           fullWidth
           size="small"
-          placeholder={selected ? "Écrire un message…" : "Sélectionnez une conversation…"}
+          placeholder={
+            selected ? "Écrire un message…" : "Sélectionnez une conversation…"
+          }
           multiline
           maxRows={4}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={onKeyDown}
+          onKeyDown={handleKeyDown}
         />
         <Tooltip title="Envoyer">
           <span>
-            <IconButton color="primary" onClick={send} disabled={disabled}>
+            <IconButton color="primary" onClick={onSend} disabled={disabled}>
               <SendIcon />
             </IconButton>
           </span>

@@ -1,3 +1,4 @@
+// src/chat/ChatLayout.tsx
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { UserRoomList } from "./UserRoomList";
@@ -5,41 +6,41 @@ import { MessageList } from "./MessageList";
 import { MessageComposer } from "./MessageComposer";
 import { useChatStore } from "../store/chatStore";
 import { getSession } from "../user/loginApi";
-import { useNavigate } from "react-router-dom"; // Ajoutez cet import
+import { useNavigate } from "react-router-dom";
 
 export default function ChatLayout() {
-  const { setSessionToken } = useChatStore();
-  const navigate = useNavigate(); // Utilisez useNavigate
+  const { setSessionToken, setMeId } = useChatStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-  const s = getSession();
-  console.log("Session retrieval:", s);
-  
-  if (!s?.token) {
-    console.error("No valid session found");
-    navigate("/login");
-    return;
-  }
+    const s = getSession(); // { token, id, username, ... }
+    if (!s?.token) {
+      navigate("/login");
+      return;
+    }
 
-  setSessionToken(s.token);
-}, [setSessionToken, navigate]);
+    // Alimente le store
+    setSessionToken(s.token);
+    // ⚠️ ton backend renvoie "id", donc on l’utilise tel quel
+    if (s.id != null) setMeId(String(s.id));
+  }, [setSessionToken, setMeId, navigate]);
 
-  // Récupération du token avec vérification
-  const token = useChatStore.getState().sessionToken ?? 
-               getSession()?.token ?? 
-               "";
+  // Source unique de vérité pour le token
+  const token =
+    useChatStore.getState().sessionToken ??
+    getSession()?.token ??
+    "";
 
-  // Vérification finale du token
-  if (!token) {
-    return null; // Ou redirection
-  }
+  if (!token) return null;
 
   return (
     <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
+      {/* Colonne gauche : salons + users */}
       <UserRoomList token={token} />
+      {/* Colonne droite : messages + composer */}
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <MessageList />
-        <MessageComposer token={token} />
+        <MessageComposer />
       </Box>
     </Box>
   );
