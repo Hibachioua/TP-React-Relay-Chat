@@ -23,14 +23,16 @@ type ChatMessage = {
 // src/store/chatStore.ts
 export type ChatState = {
   sessionToken?: string;
-  meId?: string;                     // ⬅️ NEW
+  meId?: string;
+  meName?: string;                       // ⬅️ NEW
   users: PublicUser[];
   rooms: { id: string; name: string }[];
   selected?: Target;
   messages: ChatMessage[];
 
   setSessionToken: (t?: string) => void;
-  setMeId: (id?: string) => void;    // ⬅️ NEW
+  setMeId: (id?: string) => void;
+  setMeName: (name?: string) => void;     // ⬅️ NEW
   setUsers: (u: PublicUser[]) => void;
   setRooms: (r: { id: string; name: string }[]) => void;
   select: (t?: Target) => void;
@@ -40,14 +42,16 @@ export type ChatState = {
 
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionToken: undefined,
-  meId: undefined,                   // ⬅️ NEW
+  meId: undefined,
+  meName: undefined,                   // ⬅️ NEW
   users: [],
   rooms: [],
   selected: undefined,
   messages: [],
 
   setSessionToken: (t?: string) => set({ sessionToken: t }),
-  setMeId: (id?: string) => set({ meId: id }),   // ⬅️ NEW
+  setMeId: (id?: string) => set({ meId: id }),
+  setMeName: (name) => set({ meName: name }),  // ⬅️ NEW
   setUsers: (u) => set({ users: u }),
   setRooms: (r) => set({ rooms: r }),
   select: (t) => set({ selected: t }),

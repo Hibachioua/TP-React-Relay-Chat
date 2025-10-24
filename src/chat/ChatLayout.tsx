@@ -9,7 +9,7 @@ import { getSession } from "../user/loginApi";
 import { useNavigate } from "react-router-dom";
 
 export default function ChatLayout() {
-  const { setSessionToken, setMeId } = useChatStore();
+  const { setSessionToken, setMeId, setMeName } = useChatStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +23,8 @@ export default function ChatLayout() {
     setSessionToken(s.token);
     // ⚠️ ton backend renvoie "id", donc on l’utilise tel quel
     if (s.id != null) setMeId(String(s.id));
-  }, [setSessionToken, setMeId, navigate]);
+    if (s.username) setMeName(s.username);
+  }, [setSessionToken, setMeId,setMeName, navigate]);
 
   // Source unique de vérité pour le token
   const token =
