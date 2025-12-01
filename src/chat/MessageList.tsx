@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useChatStore } from "../store/chatStore";
+import React from "react";
 
 export function MessageList() {
   const { messages, selected, users, meId } = useChatStore();

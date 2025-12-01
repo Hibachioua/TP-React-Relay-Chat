@@ -1,5 +1,5 @@
 
-import { Session, SessionCallback, ErrorCallback } from "../model/common";
+import type { Session, SessionCallback, ErrorCallback } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
 
