@@ -1,6 +1,5 @@
-// src/user/Register.tsx
 import React, { useState } from "react";
-import { registerUser } from "./registerApi"; // à implémenter plus tard
+import { registerUser } from "./registerApi";
 import { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
@@ -43,7 +42,6 @@ export function Register() {
     const confirm = (data.get("confirm") as string) ?? "";
     const accepted = !!data.get("terms");
 
-    // Validations minimales côté client (dans l'esprit de Login.tsx)
     if (!username || !password) {
       setError(
         new CustomError("Veuillez saisir un identifiant et un mot de passe.")
@@ -76,7 +74,6 @@ export function Register() {
       return;
     }
 
-    // Appel API d'inscription (même pattern que loginUser de Login.tsx)
     registerUser(
       { user_id: -1, username, password, email },
       (result: Session) => {
@@ -142,7 +139,7 @@ export function Register() {
             type="email"
             autoComplete="email"
             fullWidth
-            required // <== important
+            required 
             margin="normal"
             size="medium"
           />

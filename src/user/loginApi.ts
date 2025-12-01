@@ -32,7 +32,7 @@ export function clearSession() {
 }
 
 export function loginUser(
-  identifier: string,   // 👈 au lieu de username
+  identifier: string,  
   password: string,
   onResult: SessionCallback,
   onError: ErrorCallback

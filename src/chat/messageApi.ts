@@ -1,4 +1,3 @@
-// src/chat/messagesApi.ts
 import type { Target } from "../store/chatStore";
 
 export type RawRow = {
@@ -7,7 +6,7 @@ export type RawRow = {
   to_user_id?: string | number | null;
   room_id?: string | null;
   text: string;
-  created_at: string; // ISO
+  created_at: string; 
 };
 
 export async function fetchMessagesAPI(

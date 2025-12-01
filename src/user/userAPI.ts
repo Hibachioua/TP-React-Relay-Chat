@@ -1,27 +1,12 @@
 import { clearSession } from "../user/loginApi";
-/**
- * Types publics d'utilisateur, correspondant exactement
- * à la réponse de ton endpoint /api/users
- *
- * (select user_id, username, TO_CHAR(last_login, ...) as last_login)
- */
+
 export type PublicUser = {
   user_id: string;
   username: string;
   last_login: string;
 };
 
-/**
- * Récupère la liste des utilisateurs publics depuis l'API.
- * 
- * ⚠️ Important :
- *  - Nécessite que l'utilisateur soit connecté.
- *  - Le token de session doit être ajouté dans le header :
- *      Authorization: Bearer <token>
- *
- * En cas d'erreur 401 "UNAUTHORIZED", cela signifie que
- * le token est manquant ou invalide (session expirée).
- */
+
 export async function fetchUsers(token: string): Promise<PublicUser[]> {
   try {
     const res = await fetch("/api/users", {
@@ -61,5 +46,5 @@ export async function fetchMessages(token: string, kind: "user" | "room", id: st
   });
   if (res.status === 401) throw new Error("Session expired");
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json(); // [{id, from_user_id, to_user_id, room_id, text, created_at}, ...]
+  return res.json(); 
 }

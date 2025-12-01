@@ -5,13 +5,11 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { useChatStore } from "../store/chatStore";
 import { fetchUsers } from "../user/userAPI";
 import { useNavigate } from "react-router-dom";
-// ⬇️ 1) import correct (pluriel)
 import { fetchMessagesAPI } from "./messageApi";
 
 type Props = { token: string };
 
 export function UserRoomList({ token }: Props) {
-  // ⬇️ 2) ajouter setMessagesFor
   const { users, setUsers, rooms, setRooms, selected, select, setMessagesFor } = useChatStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -74,7 +72,6 @@ export function UserRoomList({ token }: Props) {
             <ListItemButton
               key={r.id}
               selected={selected?.kind === "room" && selected.id === r.id}
-              // ⬇️ 3) utiliser openTarget
               onClick={() => openTarget({ kind: "room", id: r.id })}
             >
               <GroupOutlinedIcon fontSize="small" sx={{ mr: 1 }} />

@@ -19,7 +19,6 @@ import {
 import { Visibility, VisibilityOff, LockOutlined } from "@mui/icons-material";
 
 export function Login() {
-  // États avec types explicites et valeurs par défaut
   const [error, setError] = useState<CustomError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -29,51 +28,43 @@ export function Login() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     
-    // Réinitialisation des états
     setError(null);
     setIsLoading(true);
 
     const form = event.currentTarget;
     const data = new FormData(form);
 
-    // Extraction et validation des données
     const identifier = (data.get("identifier") as string)?.trim();
     const password = (data.get("password") as string)?.trim() ?? "";
 
-    // Validation des champs
     if (!identifier || !password) {
       setError(new CustomError("Veuillez saisir un identifiant et un mot de passe."));
       setIsLoading(false);
       return;
     }
 
-    // Gestion de la connexion
     loginUser(
       identifier,
       password,
-      // Succès
+    
       (result: Session) => {
         try {
-          // Sauvegarde de la session
-          saveSession(result);
+                    saveSession(result);
           
-          // Stockage sécurisé des informations
           sessionStorage.setItem("token", result.token);
           sessionStorage.setItem("username", result.username);
           
-          // Réinitialisation du formulaire
+          
           form.reset();
           
-          // Arrêt du chargement et navigation
           setIsLoading(false);
           navigate("/chat");
         } catch (e) {
-          // Gestion des erreurs inattendues
           setError(new CustomError("Erreur technique lors de la connexion."));
           setIsLoading(false);
         }
       },
-      // Erreur
+      
       (loginError: CustomError) => {
         setError(loginError ?? new CustomError("Échec de connexion."));
         setIsLoading(false);

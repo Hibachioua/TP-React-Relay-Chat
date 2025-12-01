@@ -145,7 +145,7 @@ Le service [users.js](api/users.js) permet de vérifier que l'utilisateur est bi
  - Utiliser ce service pour récupérer la liste des utilisateurs et l'enregistrer dans le store
  - Si vous obtenez une erreur 401 "UNAUTHORIZED", c'est que vous avez oublié de [mettre le token de session en header](#session).
  - Afficher la liste avec le nom de chaque utilisateur et sa date de dernière connexion 
-(filtrer pour ne pas afficher dans la liste l'utilisateur connecté 😁)
+(filtrer pour ne pas afficher dans la liste l'utilisateur connecté )
  - Lors de la sélection d'un utilisateur, modifier l'URL (par exemple `/messages/user/{user_id}`),
 de sorte à retomber sur la bonne discussion lors d'un F5 ou de l'accès au site directement par l'URL de la conversation ciblé.
 (c'est une pratique courante pour gérer les clients qui mettent les pages en favoris du navigateur).

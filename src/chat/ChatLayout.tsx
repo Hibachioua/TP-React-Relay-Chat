@@ -36,9 +36,7 @@ export default function ChatLayout() {
 
   return (
     <Box sx={{ display: "flex", height: "calc(100vh - 64px)" }}>
-      {/* Colonne gauche : salons + users */}
       <UserRoomList token={token} />
-      {/* Colonne droite : messages + composer */}
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <MessageList />
         <MessageComposer />

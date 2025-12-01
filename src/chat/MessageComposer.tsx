@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Box, IconButton, Paper, TextField, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { useChatStore } from "../store/chatStore";
-// ⬅️ MessageComposer.tsx est dans src/chat, donc:
 import { sendMessageAPI, fetchMessagesAPI } from "./messageApi";
 
 export function MessageComposer() {
@@ -14,7 +13,6 @@ export function MessageComposer() {
 
     const sentText = text.trim();
 
-    // optimistic
     const tempId = `temp:${crypto.randomUUID()}`;
     addMessage({
       id: tempId,
@@ -50,7 +48,6 @@ export function MessageComposer() {
     }
   };
 
-  // Enter envoie, Shift+Enter fait un retour à la ligne
  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();

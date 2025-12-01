@@ -9,9 +9,8 @@ export default function RequireAuth() {
   const isAuthenticated = !!session?.token;
 
   if (!isAuthenticated) {
-    // Redirige vers /login si pas de token
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <Outlet />; // sinon affiche la route protégée
+  return <Outlet />; 
 }

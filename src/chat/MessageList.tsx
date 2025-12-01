@@ -1,4 +1,4 @@
-// src/chat/MessageList.tsx
+
 import { useEffect, useMemo, useRef } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useChatStore } from "../store/chatStore";
@@ -21,7 +21,7 @@ export function MessageList() {
     return u ? u.username : "Conversation";
   }, [selected, users]);
 
-  // auto-scroll en bas à chaque update
+  
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [current.length]);
@@ -61,7 +61,7 @@ export function MessageList() {
           const isMine =
             m.from === "me" || (meId && String(m.from) === String(meId));
           const isRoom = selected?.kind === "room";
-          // label émetteur
+         
           let sender = "";
           if (isRoom) {
             if (isMine) {

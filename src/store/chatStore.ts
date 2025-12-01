@@ -24,7 +24,7 @@ type ChatMessage = {
 export type ChatState = {
   sessionToken?: string;
   meId?: string;
-  meName?: string;                       // ⬅️ NEW
+  meName?: string;                       
   users: PublicUser[];
   rooms: { id: string; name: string }[];
   selected?: Target;
@@ -32,7 +32,7 @@ export type ChatState = {
 
   setSessionToken: (t?: string) => void;
   setMeId: (id?: string) => void;
-  setMeName: (name?: string) => void;     // ⬅️ NEW
+  setMeName: (name?: string) => void;     
   setUsers: (u: PublicUser[]) => void;
   setRooms: (r: { id: string; name: string }[]) => void;
   select: (t?: Target) => void;
@@ -43,7 +43,7 @@ export type ChatState = {
 export const useChatStore = create<ChatState>((set, get) => ({
   sessionToken: undefined,
   meId: undefined,
-  meName: undefined,                   // ⬅️ NEW
+  meName: undefined,                   
   users: [],
   rooms: [],
   selected: undefined,
@@ -51,7 +51,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setSessionToken: (t?: string) => set({ sessionToken: t }),
   setMeId: (id?: string) => set({ meId: id }),
-  setMeName: (name) => set({ meName: name }),  // ⬅️ NEW
+  setMeName: (name) => set({ meName: name }),  
   setUsers: (u) => set({ users: u }),
   setRooms: (r) => set({ rooms: r }),
   select: (t) => set({ selected: t }),
