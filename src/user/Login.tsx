@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, saveSession } from "./loginApi";
-import { Session } from "../model/common";
+import type { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
 import {

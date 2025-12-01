@@ -38,9 +38,12 @@ Pour réaliser ce TP, nous allons utiliser la plateforme [vercel](https://vercel
 - Charger les variables d'environnement : `export $(cat .env.development.local | xargs)`
 - Installer les dépendances du projet : `npm install` ou `yarn install`
 
-Le projet peut à présent être exécuté en local, en se connectant au cache et la base de données distante,
-avec la commande `vercel dev` 🎉
+ 
+> [!CAUTION]
+> Le projet **ne peut pas** être lancé avec la commande `npm run start` ou `npm run dev` car celle-ci ne lancerait que l'application React et pas les fonctions Serveless utilisées pour se connecter à la base de données et au cache.  
+> 🚀 Pour lancer le projet, il faut utiliser la commande `vercel dev`
 
+ 
 La requête présente dans le fichier [scripts/db.sql](scripts/db.sql) permet d'initialiser un utilisateur `test / testubo`.
 Si tout est bon, il devrait permettre de se connecter sur l'ébauche de formulaire fourni.
 
@@ -81,7 +84,7 @@ Avant de passer à la suite, lire la note sur la [gestion du mot de passe](#mdp)
 <a id="session"></a>
 Contrairement à ce que vous avez peut-être déjà rencontré sur d'autres framework, ici la session utilisateur n'est pas gérée comme par magie
 via des cookies, JSESSIONID ou autre.<br/>
-Nous allons utiliser le schéma [Bearer Authentication](https://swagger.io/docs/specification/v3_0/authentication/bearer-authentication/) : 
+Nous allons utiliser le schéma [Bearer Authorization](https://swagger.io/docs/specification/v3_0/authentication/bearer-authentication/) : 
 ce sera à vous de gérer la persistance, au niveau du navigateur, du token de session récupéré lors de la connexion ; et d'envoyer ce token
 en header de chaque requête, sous la forme `Authorization: Bearer <token>`, afin de pouvoir valider la connexion de l'utilisateur au niveau
 des services API.
@@ -99,7 +102,7 @@ Déroulé du service login :
 - On stocke les infos de l'utilisateur en cache dans une Map indexée par son identifiant (peut être utile dans la suite du TP 😉).
 - Pour finir, on retourne le token en réponse.
 - 🚨 Ce token est à enregistrer au niveau de l'application React et il devra être envoyé lors de chaque
-  appel API comme preuve de la connexion de l'utilisateur, sous la forme d'un header : `Authentication: Bearer le_token_reçu`.
+  appel API comme preuve de la connexion de l'utilisateur, sous la forme d'un header : `Authorization: Bearer le_token_reçu`.
   Le fichier [lib/session.js](lib/session.js) contient une fonction `checkSession()` permettant aux services API de vérifier que l'utilisateur est bien connecté et qu'il a le droit d'appeler ce service.
 
 
@@ -219,7 +222,7 @@ Instancier et configurer le client :
 const beamsTokenProvider = new TokenProvider({
     url: "/api/beams",
     headers: {
-        Authentication: "Bearer " + TOKEN_SESSION, // Headers your auth endpoint needs
+        Authorization: "Bearer " + TOKEN_SESSION, // Headers your auth endpoint needs
     },
 });
 

@@ -23,16 +23,14 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.4",
-    "react-scripts": "5.0.1",
     "vercel": "^48.4.1",
     "web-vitals": "^5.1.0",
     "zustand": "^5.0.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
@@ -53,15 +51,18 @@
     "@typescript-eslint/parser": "^5.5.0",
     "@vercel/edge": "^1.2.2",
     "@vercel/kv": "^3.0.0",
-    "@vercel/node": "^5.4.1",
+    "@vercel/node": "^5.3.26",
     "@vercel/postgres": "^0.10.0",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-jsx": "^0.1.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.5",
-    "react-snap": "^1.23.0",
-    "typescript": "^4"
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.45.0",
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
   }
 }
