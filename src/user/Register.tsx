@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { registerUser } from "./registerApi";
-import { Session } from "../model/common";
+import type { Session } from "../model/common";
 import { CustomError } from "../model/CustomError";
 
 import {

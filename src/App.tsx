@@ -1,4 +1,3 @@
-import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, CssBaseline, Container } from "@mui/material";
 import { theme } from "./theme";
@@ -7,6 +6,8 @@ import { Login } from "./user/Login";
 import { Register } from "./user/Register";
 import ChatLayout from "./chat/ChatLayout";
 import RequireAuth from "./router/RequireAuth";
+import React from "react";
+
 
 function App() {
   return (
